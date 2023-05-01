@@ -67,7 +67,7 @@
               <el-button
                 @click="searchHandle"
                 type="primary"
-                :style="{ width: '70%' }"
+                :style="{ width: '210px' }"
                 >搜索</el-button
               >
             </el-form-item>
@@ -75,46 +75,46 @@
         </div>
       </el-col>
       <el-col :span="17">
-        <el-table
-          :data="searchList"
-          style="width: 92%"
-          class="result-table"
-          height="480"
-          stripe
-        >
-          <el-table-column type="index" width="80" />
-          <el-table-column prop="filename" label="文件名" width="250" />
-          <el-table-column label="搜索结果">
-            <template #default="scope">
-              <el-image
-                class="scale-pic"
-                :zoom-rate="1.2"
-                style="width: 80px; height: 80px"
-                :src="scope.row.filepath_thumbnail"
-                fit="fill"
-                loading="lazy"
-                hide-on-click-modal
-                :preview-teleported="true"
-                :initial-index="0"
-                :preview-src-list="[scope.row.filepath_thumbnail]"
-              ></el-image>
-            </template>
-          </el-table-column>
-          <el-table-column label="用户反馈" width="150">
-            <template #default="scope">
-              <span
-                :class="['iconfont', scope.row.like ? 'active' : '']"
-                @click="handleLike(scope.row, 1)"
-                >&#xe869;</span
-              >
-              <span
-                :class="['iconfont', scope.row.unlike ? 'active' : '']"
-                @click="handleLike(scope.row, 0)"
-                >&#xe86a;</span
-              >
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="search-panel">
+          <el-table
+            :data="searchList"
+            style="width: 92%"
+            stripe
+          >
+            <el-table-column type="index" width="80" />
+            <el-table-column prop="filename" label="文件名" width="250" />
+            <el-table-column label="搜索结果">
+              <template #default="scope">
+                <el-image
+                  class="scale-pic"
+                  :zoom-rate="1.2"
+                  style="width: 80px; height: 80px"
+                  :src="scope.row.filepath_thumbnail"
+                  fit="fill"
+                  loading="lazy"
+                  hide-on-click-modal
+                  :preview-teleported="true"
+                  :initial-index="0"
+                  :preview-src-list="[scope.row.filepath_thumbnail]"
+                ></el-image>
+              </template>
+            </el-table-column>
+            <el-table-column label="用户反馈" width="150">
+              <template #default="scope">
+                <span
+                  :class="['iconfont', scope.row.like ? 'active' : '']"
+                  @click="handleLike(scope.row, 1)"
+                  >&#xe869;</span
+                >
+                <span
+                  :class="['iconfont', scope.row.unlike ? 'active' : '']"
+                  @click="handleLike(scope.row, 0)"
+                  >&#xe86a;</span
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -134,6 +134,7 @@ const rules = {
 const api = {
   search: "/api/search",
 };
+// const height =
 // 图片上传
 const commentImg = ref(null);
 
@@ -232,11 +233,11 @@ const handleLike = (value, type) => {
       }
     }
   }
-  .result-table {
-    .scale-pic {
-      opacity: 0.7;
-      z-index: 99999;
-    }
+  .search-panel{
+    padding: 10px;
+    box-sizing: border-box;
+    height: calc(100vh - 100px);
+    overflow-y: scroll;
   }
 }
 </style>>
