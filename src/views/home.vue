@@ -130,7 +130,6 @@ const formData = ref({});
 const formDataRef = ref();
 const rules = {
   algo: [{ required: true, message: "请选择算法", trigger: "blur" }],
-  picture: [{ required: true, message: "请选择图片", trigger: "blur" }],
 };
 const api = {
   search: "/api/search",
