@@ -52,7 +52,7 @@ const api = {
 const rules = {
   account: [
     { required: true, message: "请输入邮箱", trigger: "blur" },
-    { validator: proxy.Verify.email, message: "请输入正确的邮箱" },
+    { validator: proxy.Verify.email, message: "请输入正确的邮箱",trigger: "blur" },
   ],
   passwd: [{ required: true, message: "请输入密码", trigger: "blur" }],
 };

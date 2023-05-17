@@ -15,7 +15,7 @@
   >
     <template #error>
       <div class="image-slot">
-        <el-icon><icon-picture /></el-icon>
+        <el-icon><Picture /></el-icon>
       </div>
     </template>
   </el-image>
@@ -45,5 +45,8 @@ const props = defineProps({
   width: 210px;
   height: 210px;
   background: rgb(245, 247, 250);
+  .image-slot{
+    display: none;
+  }
 }
 </style>

@@ -29,22 +29,25 @@
 </template>
 
 <script setup>
-import {useRoute, useRouter} from 'vue-router'
-const route = useRoute()
-const router = useRouter()
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+const router = useRouter();
 </script>
 
 <style lang="scss" scoped>
 .container {
   .el-menu {
     width: 150px;
-    height: 100vh;
+    height: calc(100vh);
     overflow: hidden;
     border-right: none;
-    a{
-    color: #fff;
+    a {
+      color: #fff;
+      font-size: 18px;
+    }
+    .el-menu-item{
+      font-size: 18px;
+    }
   }
-  }
-
 }
 </style>

@@ -13,6 +13,7 @@ export default defineConfig({
   server:{
     hmr:true,
     host:'0.0.0.0',
+    port:5004,
     proxy:{
       "/api":{
         target:"http://10.199.130.173:8000",

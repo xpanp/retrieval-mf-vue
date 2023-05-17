@@ -1,13 +1,14 @@
 <template>
   <div class="picture-container">
-    <el-form :model="formData" :rules="rules" ref="formDataRef" @submit.prevent>
+    <el-form :model="formData" ref="formDataRef" @submit.prevent>
       <el-form-item prop="picture">
         <!-- 这里是发表图片位置 -->
         <div class="select-image">
           <CommentImage
             :src="commentImg"
             :srcList="[commentImg]"
-            :width="800"
+            :width="1500"
+            :height="400"
           ></CommentImage>
           <span
             v-if="commentImg"
@@ -27,7 +28,7 @@
               v-if="!commentImg"
               class="el-icon--upload"
               :style="{
-                'font-size': '20px',
+                'font-size': '40px',
                 color: `var(--link)`,
                 'margin-right': '6px',
               }"
@@ -41,7 +42,6 @@
                 jpg/png files with a size less than 20MB
               </div>
             </template>
-            <!-- <span v-if="!commentImg" class="iconfont icon-image"></span> -->
           </el-upload>
         </div>
       </el-form-item>
@@ -64,9 +64,6 @@ const api = {
 };
 const formData = ref({});
 const formDataRef = ref();
-const rules = {
-  title: [{ required: true, message: "请选择图片" }],
-};
 
 // 提交信息
 // 图片上传
@@ -91,6 +88,9 @@ const removeCommentImg = () => {
 const postHandle = () => {
   formDataRef.value.validate(async (valid) => {
     if (!valid) return;
+    if(!commentImg.value){
+      proxy.Message.error("请输入图片")
+    }
     // 参数准备完毕：调用接口更新文章
     const params = Object.assign({}, formData.value);
     const result = await proxy.Request({
@@ -100,19 +100,19 @@ const postHandle = () => {
     if (!result) {
       return;
     }
-    proxy.Message.success("上传成功");
+      proxy.Message.success("上传成功")
   });
 };
 </script>
   
 <style lang="scss">
 .picture-container {
-  display: flex;
   flex-direction: column;
   position: relative;
   padding: 0 20px;
   width: 100%;
   .el-form-item__content {
+    margin-top: 30px;
     justify-content: center;
     flex-direction: column;
   }
@@ -121,12 +121,17 @@ const postHandle = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    .iconfont {
+      font-size: 30px;
+      cursor: pointer;
+    }
   }
   .pic-select {
+    margin-top: 30px;
     .upload-demo {
       .el-upload--text {
         .el-upload__text {
-          font-size: 16px;
+          font-size: 20px;
           color: var(--text);
         }
       }

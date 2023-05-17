@@ -1,7 +1,7 @@
 <template>
   <div class="contain-panel">
-    <el-row :gutter="10">
-      <el-col :span="7"
+    <el-row :gutter="20">
+      <el-col :span="6"
         ><div class="container">
           <el-form
             :model="formData"
@@ -11,7 +11,11 @@
           >
             <!-- 模型选择 -->
             <el-form-item label="算法选择" prop="algo">
-              <el-select v-model="formData.algo" placeholder="请选择模型">
+              <el-select
+                v-model="formData.algo"
+                placeholder="请选择模型"
+                :style="{ width: '350px' }"
+              >
                 <el-option label="fusion" value="fusion" />
                 <el-option label="vgg" value="vgg" />
                 <el-option label="vit" value="vit" />
@@ -34,15 +38,14 @@
               </div>
             </el-form-item>
             <el-form-item prop="picture">
-              <!-- 登录发表图片 -->
               <div class="insert-img">
                 <!-- 这里是发表图片位置 -->
-                <div class="comment-image">
+                <div class="comment-image" ref="toImage">
                   <CommentImage
                     :src="commentImg"
                     :srcList="[commentImg]"
-                    :width="210"
-                    :height="210"
+                    :width="350"
+                    :height="350"
                   ></CommentImage>
                   <span
                     v-if="commentImg"
@@ -51,6 +54,9 @@
                   ></span>
                 </div>
                 <div class="pic-select">
+                  <!-- 图片上传 -->
+                  <!-- :http-request="selectImg"
+                    :on-change="changeUpload" -->
                   <el-upload
                     name="file"
                     :show-file-list="false"
@@ -67,65 +73,63 @@
               <el-button
                 @click="searchHandle"
                 type="primary"
-                :style="{ width: '210px' }"
+                :style="{ width: '350px' }"
                 >搜索</el-button
               >
             </el-form-item>
           </el-form>
         </div>
       </el-col>
+      <el-col :span="1"> </el-col>
       <el-col :span="17">
-        <div class="search-panel">
-          <el-table
-            :data="searchList"
-            style="width: 92%"
-            stripe
+        <div class="image-panel" v-if="searchList.length > 0">
+          <el-card
+            v-for="item in searchList"
+            :key="item.id"
+            class="imgage-result"
+            :body-style="{ padding: '3px' }"
           >
-            <el-table-column type="index" width="80" />
-            <el-table-column prop="filename" label="文件名" width="250" />
-            <el-table-column label="搜索结果">
-              <template #default="scope">
-                <el-image
-                  class="scale-pic"
-                  :zoom-rate="1.2"
-                  style="width: 80px; height: 80px"
-                  :src="scope.row.filepath_thumbnail"
-                  fit="fill"
-                  loading="lazy"
-                  hide-on-click-modal
-                  :preview-teleported="true"
-                  :initial-index="0"
-                  :preview-src-list="[scope.row.filepath_thumbnail]"
-                ></el-image>
-              </template>
-            </el-table-column>
-            <el-table-column label="用户反馈" width="150">
-              <template #default="scope">
-                <span
-                  :class="['iconfont', scope.row.like ? 'active' : '']"
-                  @click="handleLike(scope.row, 1)"
-                  >&#xe869;</span
-                >
-                <span
-                  :class="['iconfont', scope.row.unlike ? 'active' : '']"
-                  @click="handleLike(scope.row, 0)"
-                  >&#xe86a;</span
-                >
-              </template>
-            </el-table-column>
-          </el-table>
+            <el-image
+              class="scale-pic"
+              :zoom-rate="1.2"
+              :src="item.filepath_thumbnail"
+              fit="fill"
+              loading="lazy"
+              hide-on-click-modal
+              :preview-teleported="true"
+              :initial-index="0"
+              :preview-src-list="[item.filepath_thumbnail]"
+            ></el-image>
+            <div class="image-info">
+              <span class="filename">
+                {{ item.filename }}
+              </span>
+              <span
+                :class="['iconfont', item.like ? 'active' : '']"
+                @click="handleLike(item, 1)"
+                >&#xe869;</span
+              >
+              <span
+                :class="['iconfont', item.unlike ? 'active' : '']"
+                @click="handleLike(item, 0)"
+                >&#xe86a;</span
+              >
+            </div>
+          </el-card>
+        </div>
+        <div class="nodata-panel" v-else>
+          <span class="no-data">暂无内容</span>
         </div>
       </el-col>
     </el-row>
+    <cropperDlg ref="cropperDlg" @cropperImg="cropperImg"></cropperDlg>
   </div>
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, nextTick } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, getCurrentInstance, nextTick, reactive } from "vue";
+import cropperDlg from "./cropper.vue";
 const { proxy } = getCurrentInstance();
-const route = useRoute();
-const router = useRouter();
 const formData = ref({});
 const formDataRef = ref();
 const rules = {
@@ -134,7 +138,6 @@ const rules = {
 const api = {
   search: "/api/search",
 };
-// const height =
 // 图片上传
 const commentImg = ref(null);
 
@@ -185,7 +188,31 @@ const handleLike = (value, type) => {
     value.unlike = !value.unlike;
     value.like = false;
   }
+  console.log( internalInstance.ctx.$refs.cropperDlg.changeImage);
+ 
 };
+const internalInstance = getCurrentInstance();
+const imgFile = ref("");
+const cropperImg = (file) => {
+  if (internalInstance.ctx.$refs.cropperDlg && imgFile.value) {
+    const _f = imgFile.value;
+    const _file = readFile(_f);
+    const _fileInfo = {
+      url: _f,
+      size: _file.size,
+      file: _file,
+    };
+    internalInstance.ctx.$refs.cropperDlg.changeImage(_fileInfo);
+  }
+};
+const readFile = (file, callback) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = (e) => {
+    callback(e.target.result);
+  };
+};
+
 </script>
 
 <style lang="scss">
@@ -193,15 +220,9 @@ const handleLike = (value, type) => {
   box-sizing: border-box;
   overflow: hidden;
   padding-top: 10px;
-  .iconfont {
-    margin: 0 8px;
-    cursor: pointer;
-  }
-  .active {
-    color: var(--link);
-  }
+
   .container {
-    padding: 20px 5px;
+    padding: 40px 5px;
     .insert-img {
       position: relative;
       .pic-select {
@@ -211,7 +232,7 @@ const handleLike = (value, type) => {
         position: absolute;
         top: -10px;
         right: -5px;
-        font-size: 20px;
+        font-size: 30px;
         color: var(--link);
       }
     }
@@ -233,11 +254,61 @@ const handleLike = (value, type) => {
       }
     }
   }
-  .search-panel{
-    padding: 10px;
-    box-sizing: border-box;
-    height: calc(100vh - 100px);
+
+  .image-panel {
+    width: 100%;
+    height: 700px;
+    margin-top: 20px;
     overflow-y: scroll;
+    display: flex;
+    justify-content: space-around;
+    height: calc(100vh - 110px);
+    flex-wrap: wrap;
+    .imgage-result {
+      padding: 3px 10px;
+      .image-info {
+        width: 100%;
+        line-height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .iconfont {
+          cursor: pointer;
+          margin: 0 10px;
+          font-size: 18px;
+        }
+        .active {
+          color: var(--link);
+        }
+      }
+    }
+
+    .el-card__body {
+      display: flex;
+      flex-direction: column;
+      font-size: 16px;
+      font-weight: 200px;
+      color: rgb(31, 29, 29);
+      align-items: center;
+    }
+  }
+  .nodata-panel {
+    display: flex;
+    height: 300px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    .no-data {
+      font-size: 30px;
+      color: rgb(144, 141, 141);
+    }
+  }
+
+  .cropper-content {
+    .cropper {
+      width: auto;
+      height: 400px;
+    }
   }
 }
 </style>>
