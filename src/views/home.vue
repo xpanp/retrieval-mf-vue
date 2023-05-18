@@ -166,10 +166,8 @@ const selectImg = (file) => {
   img.readAsDataURL(file);
   img.onload = ({ target }) => {
     let imgData = target.result;
-    // afterImg.value = imgData
     myCropper.replace(imgData, false);
     commentImg.value = imgData;
-    console.log(commentImg.value)
     // 无剪裁图片按照原图片搜索
     formData.value.file = dataURLtoFile(commentImg.value, "crop.jpg");
   };

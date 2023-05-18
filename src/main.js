@@ -21,7 +21,6 @@ import { lazyLoad } from './directives/lazyLoad'
 // 引入组件
 import CommentImage from './components/CommentImage.vue'
 import BarPrecess from './components/BarPrecess.vue'
-import VueCropper from 'vue-cropper'
 const app = createApp(App)
 app.config.globalProperties.VueCookies = VueCookies
 app.config.globalProperties.Verify = Verify
@@ -38,7 +37,6 @@ app.component("BarPrecess",BarPrecess)
 
 app.use(router)
 app.use(store)
-app.use(VueCropper)
 app.use(ElementPlus)
 
 // 防抖

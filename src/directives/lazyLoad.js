@@ -1,4 +1,4 @@
-import B_gray from '@/assets/images/loading.png'; // 原始占位图
+import B_gray from '../assets/images/loading.png'; // 原始占位图
 
 export const lazyLoad = {
     bind: function (el, binding) {
