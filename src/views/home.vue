@@ -47,9 +47,9 @@
                     >
                     <el-button
                       v-if="commentImg"
+                      v-debounce="{fn:removeCommentImg, event:'click',delay:200}"
                       type="danger"
                       :icon="Delete"
-                      @click="removeCommentImg"
                       >重选图片</el-button
                     >
                   </div>
@@ -70,7 +70,7 @@
                     <el-button
                       :icon="Edit"
                       size="large"
-                      @click="sureSave"
+                      v-debounce="{ fn: sureSave, event: 'click',delay: 200 }"
                       type="danger"
                     >
                       剪裁</el-button
@@ -86,7 +86,7 @@
 
             <el-form-item>
               <el-button
-                @click="searchHandle"
+                v-debounce = "{fn:searchHandle, event:'click', delay:200}"
                 type="primary"
                 :style="{ width: '250px' }"
                 >搜索</el-button
@@ -104,6 +104,7 @@
             :body-style="{ padding: '3px' }"
           >
             <el-image
+              v-lazyLoad
               class="scale-pic"
               :zoom-rate="1.2"
               :src="item.filepath_thumbnail"
@@ -145,6 +146,7 @@ import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
+import { delay } from "lodash";
 
 const { proxy } = getCurrentInstance();
 const formData = ref({ algo: "fusion" });
@@ -167,6 +169,9 @@ const selectImg = (file) => {
     // afterImg.value = imgData
     myCropper.replace(imgData, false);
     commentImg.value = imgData;
+    console.log(commentImg.value)
+    // 无剪裁图片按照原图片搜索
+    formData.value.file = dataURLtoFile(commentImg.value, "crop.jpg");
   };
 };
 // 叉掉图片
@@ -247,7 +252,11 @@ const sureSave = () => {
     })
     .toDataURL("image/jpg");
   // 把base64转为File，参数为File
-  formData.value.file = dataURLtoFile(afterImg.value, "crop.jpg");
+  if(afterImg.value){
+    // 有剪裁图片按照剪裁图片搜
+    formData.value.file = dataURLtoFile(afterImg.value, "crop.jpg");
+  }
+  
 };
 
 // 将base64转换为文件

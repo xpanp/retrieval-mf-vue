@@ -16,7 +16,7 @@
             v-model.trim="formData.dir"
           ></el-input>
           <div class="op-btn">
-            <el-button type="primary" size="large" @click="uploadDir"
+            <el-button type="primary" size="large" v-debounce="{ fn:uploadDir, event:'click',delay:200}"
               >上传</el-button
             >
           </div>

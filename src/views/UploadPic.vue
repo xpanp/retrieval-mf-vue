@@ -47,7 +47,7 @@
       </el-form-item>
       <el-form-item>
         <div class="op-btn">
-          <el-button type="primary" @click="postHandle" size="large"
+          <el-button type="primary" v-debounce="{fn:postHandle, event:'click', delay:200}" size="large"
             >上传</el-button
           >
         </div>
