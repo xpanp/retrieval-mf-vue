@@ -35,6 +35,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   }
 app.component("CommentImage",CommentImage)
 app.component("BarPrecess",BarPrecess)
+
 app.use(router)
 app.use(store)
 app.use(VueCropper)

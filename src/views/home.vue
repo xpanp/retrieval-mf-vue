@@ -11,11 +11,7 @@
           >
             <!-- 模型选择 -->
             <el-form-item label="算法选择" prop="algo">
-              <el-select
-                v-model="formData.algo"
-                placeholder="请选择模型"
-                :style="{ width: '350px' }"
-              >
+              <el-select v-model="formData.algo" placeholder="请选择模型">
                 <el-option label="fusion" value="fusion" />
                 <el-option label="vgg" value="vgg" />
                 <el-option label="vit" value="vit" />
@@ -37,26 +33,34 @@
                 </div>
               </div>
             </el-form-item>
-            <el-form-item prop="picture">
-              <div class="insert-img">
-                <!-- 这里是发表图片位置 -->
-                <div class="comment-image" ref="toImage">
-                  <CommentImage
-                    :src="commentImg"
-                    :srcList="[commentImg]"
-                    :width="350"
-                    :height="350"
-                  ></CommentImage>
-                  <span
-                    v-if="commentImg"
-                    class="iconfont icon-remove"
-                    @click="removeCommentImg"
-                  ></span>
+            <el-form-item prop="file">
+              <div class="cropper-panel">
+                <div class="before"></div>
+                <el-button
+                  :icon="Edit"
+                  size="large"
+                  @click="sureSave"
+                  type="danger"
+
+                >
+                  剪裁</el-button
+                >
+                <div class="image-source">
+                  <div class="img-container">
+                    <!-- 原始图片 -->
+                    <img
+                      :src="commentImg"
+                      ref="image"
+                      alt=""
+                      :style="{ width: '250px', height: '250px' }"
+                    />
+                  </div>
+                  <!-- 剪裁后图片 -->
+                  <div class="afterCropper">
+                    <img :src="afterImg" alt="" />
+                  </div>
                 </div>
                 <div class="pic-select">
-                  <!-- 图片上传 -->
-                  <!-- :http-request="selectImg"
-                    :on-change="changeUpload" -->
                   <el-upload
                     name="file"
                     :show-file-list="false"
@@ -66,22 +70,23 @@
                     <span v-if="!commentImg" class="iconfont icon-image"></span>
                   </el-upload>
                 </div>
+                <el-button v-if="commentImg" type="danger" :icon="Delete" @click="removeCommentImg"/>
               </div>
-            </el-form-item>
 
+            </el-form-item>
             <el-form-item>
+              
               <el-button
                 @click="searchHandle"
                 type="primary"
-                :style="{ width: '350px' }"
+                :style="{ width: '250px' }"
                 >搜索</el-button
               >
             </el-form-item>
           </el-form>
         </div>
       </el-col>
-      <el-col :span="1"> </el-col>
-      <el-col :span="17">
+      <el-col :span="18">
         <div class="image-panel" v-if="searchList.length > 0">
           <el-card
             v-for="item in searchList"
@@ -122,16 +127,20 @@
         </div>
       </el-col>
     </el-row>
-    <cropperDlg ref="cropperDlg" @cropperImg="cropperImg"></cropperDlg>
   </div>
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, nextTick, reactive } from "vue";
-import cropperDlg from "./cropper.vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
+import Cropper from "cropperjs";
+import "cropperjs/dist/cropper.css";
+
+import { Edit,Delete } from "@element-plus/icons-vue";
+
 const { proxy } = getCurrentInstance();
-const formData = ref({});
+const formData = ref({algo:'fusion'});
 const formDataRef = ref();
+
 const rules = {
   algo: [{ required: true, message: "请选择算法", trigger: "blur" }],
 };
@@ -140,21 +149,22 @@ const api = {
 };
 // 图片上传
 const commentImg = ref(null);
-
 const selectImg = (file) => {
   file = file.file;
   let img = new FileReader();
   img.readAsDataURL(file);
   img.onload = ({ target }) => {
     let imgData = target.result;
+    // afterImg.value = imgData
+    myCropper.replace(imgData, false);
     commentImg.value = imgData;
-    formData.value.file = file;
   };
 };
 // 叉掉图片
 const removeCommentImg = () => {
   formData.value.file = null;
   commentImg.value = null;
+  afterImg.value = null;
 };
 // 搜索
 const searchList = ref([]);
@@ -162,6 +172,10 @@ const searchHandle = async () => {
   formDataRef.value.validate(async (valid) => {
     if (!valid) {
       return;
+    }
+    if(!myCropper.getCroppedCanvas()){
+      proxy.Message.error("请选择图片")
+      return
     }
     const params = Object.assign({}, formData.value);
     params.result_num = 12;
@@ -179,7 +193,7 @@ const searchHandle = async () => {
     });
   });
 };
-
+// 反馈
 const handleLike = (value, type) => {
   if (type == 1) {
     value.like = !value.like;
@@ -188,31 +202,56 @@ const handleLike = (value, type) => {
     value.unlike = !value.unlike;
     value.like = false;
   }
-  console.log( internalInstance.ctx.$refs.cropperDlg.changeImage);
- 
 };
-const internalInstance = getCurrentInstance();
-const imgFile = ref("");
-const cropperImg = (file) => {
-  if (internalInstance.ctx.$refs.cropperDlg && imgFile.value) {
-    const _f = imgFile.value;
-    const _file = readFile(_f);
-    const _fileInfo = {
-      url: _f,
-      size: _file.size,
-      file: _file,
-    };
-    internalInstance.ctx.$refs.cropperDlg.changeImage(_fileInfo);
+// 剪裁图片
+
+const afterImg = ref("");
+onMounted(() => {
+  init();
+});
+var myCropper = null;
+const init = () => {
+  myCropper = new Cropper(proxy.$refs.image, {
+    viewMode: 0,
+    dragMode: "none",
+    initialAspectRatio: 1,
+    aspectRatio: 0 / 0,
+    preview: ".before",
+    background: false,
+    autoCropArea: 0.6,
+    zoomOnWheel: false,
+    resizable: true,
+    zoomable: false,
+    mouseWheelZoom: false,
+  });
+};
+// 剪裁函数
+const sureSave = () => {
+  if (!myCropper.getCroppedCanvas()) {
+    proxy.Message.error("请选择剪裁图片！！");
+    return
   }
-};
-const readFile = (file, callback) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = (e) => {
-    callback(e.target.result);
-  };
+  afterImg.value = myCropper
+    .getCroppedCanvas({
+      imageSmoothingQuality: "high",
+    })
+    .toDataURL("image/jpg");
+    // 把base64转为File，参数为File
+  formData.value.file = dataURLtoFile(afterImg.value, "crop.jpg");
 };
 
+// 将base64转换为文件
+const dataURLtoFile = (dataurl, filename) => {
+  let arr = dataurl.split(",");
+  let mime = arr[0].match(/:(.*?);/)[1];
+  let bstr = atob(arr[1]);
+  let len = bstr.length;
+  let u8arr = new Uint8Array(len);
+  while (len--) {
+    u8arr[len] = bstr.charCodeAt(len);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
 </script>
 
 <style lang="scss">
@@ -222,20 +261,43 @@ const readFile = (file, callback) => {
   padding-top: 10px;
 
   .container {
-    padding: 40px 5px;
-    .insert-img {
-      position: relative;
+    .cropper-panel {
+      display: flex;
+      flex-direction: column;
+      .before {
+        max-width: 250px;
+        max-height: 250px;
+      }
+      .image-source {
+        .img-container {
+          img {
+            max-width: 250px;
+            max-height: 250px;
+            border-top: none;
+          }
+        }
+        .afterCropper {
+          margin-top: 5px;
+          img {
+            max-width: 250px;
+            max-height: 250px;
+          }
+        }
+      }
       .pic-select {
         height: 0;
-      }
-      .iconfont {
-        position: absolute;
-        top: -10px;
-        right: -5px;
-        font-size: 30px;
-        color: var(--link);
+        .icon-image {
+          position: absolute;
+          bottom: -5px;
+          left: 115px;
+          font-size: 30px;
+          color: var(--link);
+          cursor: pointer;
+        }
       }
     }
+
+    padding: 10px 5px;
     .splitInfo {
       display: flex;
       align-items: flex-start;
