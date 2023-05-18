@@ -7,10 +7,10 @@
             :model="formData"
             :rules="rules"
             ref="formDataRef"
-            label-width="80px"
+            label-width="60px"
           >
             <!-- 模型选择 -->
-            <el-form-item label="算法选择" prop="algo">
+            <el-form-item label="算法" prop="algo">
               <el-select v-model="formData.algo" placeholder="请选择模型">
                 <el-option label="fusion" value="fusion" />
                 <el-option label="vgg" value="vgg" />
@@ -34,17 +34,30 @@
               </div>
             </el-form-item>
             <el-form-item prop="file">
+              <div class="pic-select">
+                <el-upload
+                  name="file"
+                  :show-file-list="false"
+                  accept=".png,.PNG,.JPG,.jpg,.jpeg,.JPEG,.GIF,.gif,.bmp,.BMP"
+                  :http-request="selectImg"
+                >
+                  <div class="btn-option">
+                    <el-button v-if="!commentImg" type="danger" :icon="Plus"
+                      >选择图片</el-button
+                    >
+                    <el-button
+                      v-if="commentImg"
+                      type="danger"
+                      :icon="Delete"
+                      @click="removeCommentImg"
+                      >重选图片</el-button
+                    >
+                  </div>
+                </el-upload>
+              </div>
               <div class="cropper-panel">
                 <div class="before"></div>
-                <el-button
-                  :icon="Edit"
-                  size="large"
-                  @click="sureSave"
-                  type="danger"
 
-                >
-                  剪裁</el-button
-                >
                 <div class="image-source">
                   <div class="img-container">
                     <!-- 原始图片 -->
@@ -54,28 +67,24 @@
                       alt=""
                       :style="{ width: '250px', height: '250px' }"
                     />
+                    <el-button
+                      :icon="Edit"
+                      size="large"
+                      @click="sureSave"
+                      type="danger"
+                    >
+                      剪裁</el-button
+                    >
                   </div>
                   <!-- 剪裁后图片 -->
                   <div class="afterCropper">
                     <img :src="afterImg" alt="" />
                   </div>
                 </div>
-                <div class="pic-select">
-                  <el-upload
-                    name="file"
-                    :show-file-list="false"
-                    accept=".png,.PNG,.JPG,.jpg,.jpeg,.JPEG,.GIF,.gif,.bmp,.BMP"
-                    :http-request="selectImg"
-                  >
-                    <span v-if="!commentImg" class="iconfont icon-image"></span>
-                  </el-upload>
-                </div>
-                <el-button v-if="commentImg" type="danger" :icon="Delete" @click="removeCommentImg"/>
               </div>
-
             </el-form-item>
+
             <el-form-item>
-              
               <el-button
                 @click="searchHandle"
                 type="primary"
@@ -135,10 +144,10 @@ import { ref, getCurrentInstance, onMounted } from "vue";
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 
-import { Edit,Delete } from "@element-plus/icons-vue";
+import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 
 const { proxy } = getCurrentInstance();
-const formData = ref({algo:'fusion'});
+const formData = ref({ algo: "fusion" });
 const formDataRef = ref();
 
 const rules = {
@@ -173,9 +182,9 @@ const searchHandle = async () => {
     if (!valid) {
       return;
     }
-    if(!myCropper.getCroppedCanvas()){
-      proxy.Message.error("请选择图片")
-      return
+    if (!myCropper.getCroppedCanvas()) {
+      proxy.Message.error("请选择图片");
+      return;
     }
     const params = Object.assign({}, formData.value);
     params.result_num = 12;
@@ -218,25 +227,26 @@ const init = () => {
     aspectRatio: 0 / 0,
     preview: ".before",
     background: false,
-    autoCropArea: 0.6,
+    autoCropArea: 0.9,
     zoomOnWheel: false,
     resizable: true,
     zoomable: false,
     mouseWheelZoom: false,
+    responsive: true
   });
 };
 // 剪裁函数
 const sureSave = () => {
   if (!myCropper.getCroppedCanvas()) {
     proxy.Message.error("请选择剪裁图片！！");
-    return
+    return;
   }
   afterImg.value = myCropper
     .getCroppedCanvas({
       imageSmoothingQuality: "high",
     })
     .toDataURL("image/jpg");
-    // 把base64转为File，参数为File
+  // 把base64转为File，参数为File
   formData.value.file = dataURLtoFile(afterImg.value, "crop.jpg");
 };
 
@@ -270,6 +280,8 @@ const dataURLtoFile = (dataurl, filename) => {
       }
       .image-source {
         .img-container {
+          display: flex;
+          flex-direction: column;
           img {
             max-width: 250px;
             max-height: 250px;
@@ -286,13 +298,10 @@ const dataURLtoFile = (dataurl, filename) => {
       }
       .pic-select {
         height: 0;
-        .icon-image {
-          position: absolute;
-          bottom: -5px;
-          left: 115px;
-          font-size: 30px;
-          color: var(--link);
-          cursor: pointer;
+        :deep(.btn-option){
+          margin-bottom: 5px;
+          display: flex;
+          flex-direction: column;
         }
       }
     }
@@ -314,6 +323,14 @@ const dataURLtoFile = (dataurl, filename) => {
           margin-right: 8px;
         }
       }
+    }
+
+    .el-form-item__content{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
     }
   }
 
