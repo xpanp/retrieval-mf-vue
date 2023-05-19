@@ -32,6 +32,11 @@ const routes = [
         name: '登录',
         component: () => import('../views/Login.vue')
     },
+    {
+        path:"/:pathMatch(.*)*",
+        name:"错误页面",
+        component:()=>import("@/views/Error404.vue")
+    }
 ]
 const router = createRouter({
     history:createWebHistory(),
