@@ -67,10 +67,7 @@ instance.interceptors.response.use(
             loading.close()
         }
         const responseData = error.response.data
-        console.log(responseData.code)
-        const status = error.response.status
         // 状态
-        console.log(status)
         if (responseData.code === 4) {
             return Promise.reject({ showError: true, msg: "用户名或密码错误" })
         } else if (responseData.code === 1) {
