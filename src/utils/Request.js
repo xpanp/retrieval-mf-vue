@@ -21,10 +21,10 @@ instance.interceptors.request.use(
     config => {
         //不是所有都需要loading
         const token = VueCookies.get("token")
-        if(token){
+        if (token) {
             config.headers.Authorization = token
         }
-        
+
         if (config.showLoading) {
             loading = ElLoading.service({
                 lock: true,
@@ -44,72 +44,74 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
     (response) => {
-        const {showLoading, errorCallback, showError} = response.config
-        if(showLoading && loading){
+        const { showLoading, errorCallback, showError } = response.config
+        if (showLoading && loading) {
             loading.close()
         }
         const code = response.data.code
-        if(code === 0){
+        console.log("response:",response,response.data.code)
+        if (response.status === 200) {
             // 请求成功返回数据
             return response.data
-        }else if(code === 3){      
-            // 错误特殊提醒
-            return Promise.reject({showError:false,msg:"注册失败"})
-
-        }else if(code === 4){
-            Message.error("用户名或者密码错误")
-            // 错误特殊提醒
-            return Promise.reject({showError:false,msg:"用户名或者密码错误"})
-        }
-        else{
-            if(errorCallback){
+        }else {
+            if (errorCallback) {
                 errorCallback(response.data)
             }
-            return Promise.reject({showError:showError,msg:response.data.msg})
+            return Promise.reject({ showError: showError, msg: response.data.msg })
         }
-    }, (error) => {
-        console.log("出现错误",error.response)
+    },
+    (error) => {
         // 服务端回复错误时，提醒用户，响应拦截器做点什么
         // 请求报错,后端服务不正常500，502状态码
-        const responseData = error.response.data
-        if(error.config.showLoading && loading){
+        if (error.config.showLoading && loading) {
             loading.close()
         }
+        const responseData = error.response.data
+        console.log(responseData.code)
         const status = error.response.status
-        if(status==401){
-            Message.error(responseData.msg)
-            return Promise.reject({showError:true,msg:"用户名或密码错误"})
+        // 状态
+        console.log(status)
+        if (responseData.code === 4) {
+            return Promise.reject({ showError: true, msg: "用户名或密码错误" })
+        } else if (responseData.code === 1) {
+            return Promise.reject({ showError: true, msg: "请求参数错误" })
+        }else if (responseData.code === 2){
+            return Promise.reject({ showError: true, msg: "图片已存在" })
+        }else if (responseData.code === 3){
+            router.push('/user/login')
+            return Promise.reject({ showError: true, msg: "用户已存在,请登录" })
+        }else if (responseData.code == undefined){
+            return Promise.reject({ showError: true, msg: "你无操作权限" })
         }
-
-        return Promise.reject({showError:true,msg:"请重试！"})
+        return Promise.reject({ showError: true, msg: error.response.data.msg })
     }
 )
 // 请求封装
 const request = (config) => {
     //适合文件上传
     // axios请求接收的参数url,params,dataType,showLoading,errorCallback,showError
-    const {url, params, dataType, showLoading=true,errorCallback,showError= true} = config
+    const { url, params, dataType, showLoading = true, errorCallback, showError = true } = config
     let contentType = contentTypeForm
     //可以使用 FormData 上传文件
     let formData = new FormData()
-    for(let key in params){
-        formData.append(key,params[key] == undefined ? "" : params[key])
+    for (let key in params) {
+        formData.append(key, params[key] == undefined ? "" : params[key])
     }
-    
-    if(dataType != null && dataType === 'json'){
+
+    if (dataType != null && dataType === 'json') {
         contentType = contentTypeJson
     }
     let headers = {
-        'Content-Type':contentType,
-        'X-Requested-With':'XMLHttpRequest'
+        'Content-Type': contentType,
+        'X-Requested-With': 'XMLHttpRequest'
     }
-    return instance.post(url,formData,{
-        headers:headers,
-        showLoading:showLoading,
-        errorCallback:errorCallback,
-        showError :showError
-    }).catch(error=>{
-        if(error.showError){
+    return instance.post(url, formData, {
+        headers: headers,
+        showLoading: showLoading,
+        errorCallback: errorCallback,
+        showError: showError
+    }).catch(error => {
+        if (error.showError) {
             Message.error(error.msg)
         }
         // 这里是为什么判断if(!result)的原因

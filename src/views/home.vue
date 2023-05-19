@@ -47,7 +47,11 @@
                     >
                     <el-button
                       v-if="commentImg"
-                      v-debounce="{fn:removeCommentImg, event:'click',delay:200}"
+                      v-debounce="{
+                        fn: removeCommentImg,
+                        event: 'click',
+                        delay: 200,
+                      }"
                       type="danger"
                       :icon="Delete"
                       >重选图片</el-button
@@ -70,7 +74,7 @@
                     <el-button
                       :icon="Edit"
                       size="large"
-                      v-debounce="{ fn: sureSave, event: 'click',delay: 200 }"
+                      v-debounce="{ fn: sureSave, event: 'click', delay: 200 }"
                       type="danger"
                     >
                       剪裁</el-button
@@ -86,7 +90,7 @@
 
             <el-form-item>
               <el-button
-                v-debounce = "{fn:searchHandle, event:'click', delay:200}"
+                v-debounce="{ fn: searchHandle, event: 'click', delay: 200 }"
                 type="primary"
                 :style="{ width: '250px' }"
                 >搜索</el-button
@@ -146,8 +150,6 @@ import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
-import { delay } from "lodash";
-
 const { proxy } = getCurrentInstance();
 const formData = ref({ algo: "fusion" });
 const formDataRef = ref();
@@ -224,18 +226,29 @@ onMounted(() => {
 var myCropper = null;
 const init = () => {
   myCropper = new Cropper(proxy.$refs.image, {
-    viewMode: 0,
-    dragMode: "none",
-    initialAspectRatio: 1,
-    aspectRatio: 0 / 0,
-    preview: ".before",
-    background: false,
-    autoCropArea: 0.9,
-    zoomOnWheel: false,
-    resizable: true,
-    zoomable: false,
-    mouseWheelZoom: false,
-    responsive: true
+    aspectRatio: 0/0, // 裁剪框的宽高比,默认NAN,可以随意改变裁剪框的宽高比
+    viewMode: 0, // 0,1,2,3
+    dragMode: "move", // 'crop': 可以产生一个新的裁剪框 'move': 只可以移动 'none': 什么也不处理
+    // preview:".small",  // 添加额外的元素(容器)以供预览
+    responsive: true, //在调整窗口大小的时候重新渲染cropper,默认为true
+    restore: true, // 调整窗口大小后恢复裁剪的区域。
+    checkCrossOrigin: true, //检查当前图像是否为跨域图像,默认为true
+    modal: true, // 显示图片上方的黑色模态并在裁剪框下面，默认为true
+    guides: false, // 显示在裁剪框里面的虚线，默认为true
+    center: true, // 裁剪框在图片正中心，默认为true
+    highlight: true, // 在裁剪框上方显示白色的区域,默认为true
+    background: false, // 显示容器的网格背景(即马赛克背景)，默认为true，若为false，这不显示
+    autoCrop: true, // 当初始化时，显示裁剪框，改成false裁剪框消失需要你重绘裁剪区域，默认为true
+    autoCropArea: 1, // 定义自动裁剪面积大小(百分比)和图片进行对比，默认为0.8
+    movable: true, // 是否允许可以移动后面的图片，默认为true（但是如果dragMode为crop，由于和重绘裁剪框冲突，所以移动图片会失效）
+    rotatable: true, // 是否允许旋转图像,默认为true
+    scalable: true, // 是否允许缩放图像，默认为true
+    zoomable: true, // 是否允许放大图像，默认为true
+    zoomOnTouch: true, // 是否可以通过拖动触摸来放大图像，默认为true
+    wheelZoomRatio: 0.1, // 用鼠标移动图像时，定义缩放比例,默认0.1
+    cropBoxMovable: true, // 是否通过拖拽来移动剪裁框，默认为true
+    cropBoxResizable: true, // 是否通过拖动来调整剪裁框的大小，默认为true
+    toggleDragModeOnDblclick: true, // 当点击两次时可以在“crop”和“move”之间切换拖拽模式，默认为true
   });
 };
 // 剪裁函数
@@ -250,11 +263,10 @@ const sureSave = () => {
     })
     .toDataURL("image/jpg");
   // 把base64转为File，参数为File
-  if(afterImg.value){
+  if (afterImg.value) {
     // 有剪裁图片按照剪裁图片搜
     formData.value.file = dataURLtoFile(afterImg.value, "crop.jpg");
   }
-  
 };
 
 // 将base64转换为文件
@@ -305,7 +317,7 @@ const dataURLtoFile = (dataurl, filename) => {
       }
       .pic-select {
         height: 0;
-        :deep(.btn-option){
+        :deep(.btn-option) {
           margin-bottom: 5px;
           display: flex;
           flex-direction: column;
@@ -332,7 +344,7 @@ const dataURLtoFile = (dataurl, filename) => {
       }
     }
 
-    .el-form-item__content{
+    .el-form-item__content {
       display: flex;
       flex-direction: column;
       align-items: flex-start;

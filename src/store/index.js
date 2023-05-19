@@ -31,21 +31,12 @@ export default createStore({
         },
         updatePercentage:(state,value)=>{
             state.percentage=value
-            // if(value === 100){
-            //     state.percentage = 0
-            // }
         },
         updateStatus:(state,value)=>{
             state.status=value
-            // if(state.percentage===100){
-            //     state.status = ''
-            // }
         },
         updateTip:(state,value)=>{
             state.tip=value
-            // if(state.percentage === 100){
-            //     state.tip = "后台正在处理中..."
-            // }
         },
     },
     actions:{

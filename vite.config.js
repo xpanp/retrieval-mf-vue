@@ -2,11 +2,9 @@ import {fileURLToPath,URL} from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // cdn引入element-plus
-import { Plugin as importToCDN, autoComplete } from 'vite-plugin-cdn-import'
+import { Plugin as importToCDN } from 'vite-plugin-cdn-import'
 //代码压缩
 import viteCompression from 'vite-plugin-compression';
-// 图片压缩
-// import viteImagemin from 'vite-plugin-imagemin'
 // 可视化
 import { visualizer } from "rollup-plugin-visualizer";
 // https://vitejs.dev/config/
@@ -18,7 +16,6 @@ export default defineConfig({
       threshold: 10240,
     }),
     importToCDN({
-      
       modules: [
         {
           name: 'vue',
@@ -33,35 +30,10 @@ export default defineConfig({
         },
       ],
     }),
-  //   viteImagemin({
-  //     gifsicle: {
-  //       optimizationLevel: 7,
-  //       interlaced: false,
-  //     },
-  //     optipng: {
-  //       optimizationLevel: 7,
-  //     },
-  //     mozjpeg: {
-  //       quality: 20,
-  //     },
-  //     pngquant: {
-  //       quality: [0.8, 0.9],
-  //       speed: 4,
-  //     },
-  //     svgo: {
-  //       plugins: [
-  //         {
-  //           name: 'removeViewBox',
-  //         },
-  //         {
-  //           name: 'removeEmptyAttrs',
-  //           active: false,
-  //         },
-  //       ],
-  //     },
-  //   }),
   ],
-
+  optimizeDeps: {
+    entries:['./src/App.vue'],
+  },
   resolve:{
     alias:{
       '@': fileURLToPath(new URL('./src', import.meta.url))

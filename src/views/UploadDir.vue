@@ -25,7 +25,7 @@
     </el-form>
     <div class="tip">
       <el-card>
-        <div class="box-card">请确保该文件夹可以被服务器访问到！！！</div>
+        <div class="box-card">请确保该文件夹可以被服务器访问到，文件需要以 ‘/’ 开头！！！</div>
       </el-card>
     </div>
     <keep-alive>
@@ -51,7 +51,7 @@ import { useStore } from "vuex";
 const store = useStore();
 const { proxy } = getCurrentInstance();
 
-const formData = ref({ dir: "/data/lyy/image-test" });
+const formData = ref({});
 const formDataRef = ref();
 const rules = {
   dir: [
@@ -78,13 +78,13 @@ const uploadDir = () => {
     let result = await proxy.Request({
       url: api.uploadDir,
       params: params,
-      showError: false,
       //错误的回调，返回:错误信息
       errorCallback: (response) => {
         ElMessageBox.alert(response.info, "错误", {
           "show-close": false,
           callback: (action) => {
-            proxy.Message.warn(response.data.msg);
+            console.log("errorcallback",response)
+            proxy.Message.warn(response.msg);
           },
         });
       },
@@ -98,12 +98,15 @@ const uploadDir = () => {
       `添加成功，开始处理，任务id为：${taskid.value}，共有${task_nums.value}张图片`
     );
     statusCheck();
+    console.log(taskid.value)
     let timer = setInterval(() => {
       statusCheck();
       const base = financial(100 / statusInfo.value["task_nums"]);
-      percentage.value = financial(statusInfo.value["processed_nums"] * base);
+      console.log(base)
+      console.log("here...................",statusInfo.value["processed_nums"],statusInfo.value["task_nums"])
+      percentage.value = floatToInt(financial(statusInfo.value["processed_nums"] * base));
       store.commit("updatePercentage", percentage.value);
-
+      console.log(percentage.value)
       if (
         statusInfo.value["processed_nums"] === statusInfo.value["task_nums"]
       ) {
@@ -112,7 +115,7 @@ const uploadDir = () => {
         store.commit("updateTip", "处理完成!!");
         clearInterval(timer);
         proxy.Message.success("处理完成！！！");
-        // console.log(tip.value, status.value, percentage.value);
+        console.log(tip.value, status.value, percentage.value);
       }
     }, 3000);
   });
@@ -122,6 +125,9 @@ const status = ref("");
 const tip = ref("后台正在处理中...");
 // 数值转换
 const financial = (x) => {
+  return Number.parseFloat(x).toFixed(3);
+};
+const floatToInt = (x) => {
   return Number.parseInt(x);
 };
 // 进度条状态，异步查询
