@@ -48,8 +48,6 @@ instance.interceptors.response.use(
         if (showLoading && loading) {
             loading.close()
         }
-        const code = response.data.code
-        console.log("response:",response,response.data.code)
         if (response.status === 200) {
             // 请求成功返回数据
             return response.data

@@ -37,9 +37,10 @@ const router = createRouter({
     history:createWebHistory(),
     routes
 })
+
 router.beforeEach((to, from, next) => {
     // to and from are both route objects. must call `next`.
-    if(to.path=='/user/register'||to.path==='/user/login'||to.path==='/'){
+    if(to.path=='/user/register'||to.path==='/user/login'){
         next()
     }else{
         let token = VueCookies.get("token")
