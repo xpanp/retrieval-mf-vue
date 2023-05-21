@@ -80,27 +80,38 @@ const checkRepassword = (rule, value, callback) => {
 };
 const rules = {
   account: [
-    { required: true, message: "请输入邮箱" ,trigger: 'blur'},
-    { validator: proxy.Verify.email, message: "请输入正确的邮箱",trigger: "blur" },
+    { required: true, message: "请输入邮箱", trigger: "blur" },
+    {
+      validator: proxy.Verify.email,
+      message: "请输入正确的邮箱",
+      trigger: "blur",
+    },
   ],
-  nickname: [{ required: true, message: "请输入昵称" ,trigger: 'blur'}],
-  passwd: [{ required: true, message: "请输入密码",trigger: 'blur' }],
+  nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
+  passwd: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    {
+      validator: proxy.Verify.password,
+      message: "至少6-22位",
+      trigger: "blur",
+    },
+  ],
   repasswd: [
-    { required: true, message: "请再次输入密码", trigger:"blur"},
+    { required: true, message: "请再次输入密码", trigger: "blur" },
     {
       validator: checkRepassword,
       message: "两次输入密码不一致",
-      trigger: "blur"
+      trigger: "blur",
     },
   ],
 };
-const toRegister = async() => {
-  formDataRef.value.validate(async (valid)=>{
-    if(!valid){
-      return
+const toRegister = async () => {
+  formDataRef.value.validate(async (valid) => {
+    if (!valid) {
+      return;
     }
-    const params = Object.assign({},formData.value)
-    params.type = 100
+    const params = Object.assign({}, formData.value);
+    params.type = 100;
 
     let result = await proxy.Request({
       url: api.toRegister,
@@ -109,22 +120,22 @@ const toRegister = async() => {
     if (!result) {
       return;
     }
-    if(result.code == 0){
+    if (result.code == 0) {
       proxy.Message.success("注册成功，请登录");
     }
-    router.push({path:'/user/login'})
+    router.push({ path: "/user/login" });
   });
 };
 
 // 重置表单
-const resetForm = ()=>{
-  nextTick(()=>{
-    formDataRef.value.resetFields()
-    formData.value = {}
-  })
-}
+const resetForm = () => {
+  nextTick(() => {
+    formDataRef.value.resetFields();
+    formData.value = {};
+  });
+};
 const toBack = () => {
-  router.push({path:'/user/login'})
+  router.push({ path: "/user/login" });
 };
 </script>
 

@@ -99,7 +99,7 @@ const postHandle = () => {
     const result = await proxy.Request({
       url: api.addPic,
       params: params,
-      showError:false
+      showError:false,
     });
     if (!result) {
       proxy.Message.error("图片已入库");

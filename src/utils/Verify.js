@@ -2,7 +2,7 @@
 const regs = {
     email:/^[A-Za-z0-9]+([_\.][A-Za-z0-9]+)*@([A-Za-z0-9\-]+\.)+[A-Za-z]{2,6}$/,
     number:/^([0]|[1-9]|[0-9])$/,
-    password:/^[a-zA-Z0-9]+$/,
+    password:/^[A-Za-z0-9_*&$#@]{6,22}$/,
     fileDir: /^(\/[-\w\\]+)+\/?$/
 }
 const verify = (rule, value, reg, callback)=>{

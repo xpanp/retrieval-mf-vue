@@ -71,7 +71,7 @@ const toLogin = async () => {
       showError: false,
       //错误的回调，返回:错误信息
       errorCallback: (response) => {
-        ElMessageBox.alert(response.info, "错误", {
+        ElMessageBox.alert(response.msg, "错误", {
           "show-close": false,
           callback: (action) => {
             proxy.Message.error("用户名或密码错误");
