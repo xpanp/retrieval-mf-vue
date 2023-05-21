@@ -48,6 +48,7 @@ import {
   watch
 } from "vue";
 import { useStore } from "vuex";
+import { ElMessageBox } from 'element-plus'
 const store = useStore();
 const { proxy } = getCurrentInstance();
 
@@ -78,18 +79,19 @@ const uploadDir = () => {
     let result = await proxy.Request({
       url: api.uploadDir,
       params: params,
+      showError:false,
       //错误的回调，返回:错误信息
       errorCallback: (response) => {
-        ElMessageBox.alert(response.info, "错误", {
+        ElMessageBox.alert(response.msg, "错误", {
           "show-close": false,
           callback: (action) => {
-            console.log("errorcallback",response)
-            proxy.Message.warn(response.msg);
+            proxy.Message.warn("路径错误");
           },
         });
       },
     });
     if (!result) {
+      proxy.Message.error("路径错误");
       return;
     }
     task_nums.value = result.data["task_nums"];
@@ -98,15 +100,11 @@ const uploadDir = () => {
       `添加成功，开始处理，任务id为：${taskid.value}，共有${task_nums.value}张图片`
     );
     statusCheck();
-    console.log(taskid.value)
     let timer = setInterval(() => {
       statusCheck();
       const base = financial(100 / statusInfo.value["task_nums"]);
-      console.log(base)
-      console.log("here...................",statusInfo.value["processed_nums"],statusInfo.value["task_nums"])
       percentage.value = floatToInt(financial(statusInfo.value["processed_nums"] * base));
       store.commit("updatePercentage", percentage.value);
-      console.log(percentage.value)
       if (
         statusInfo.value["processed_nums"] === statusInfo.value["task_nums"]
       ) {
@@ -139,17 +137,9 @@ const statusCheck = async () => {
     },
     // 在封装的时候有showLoading，设置为false就没有loading的效果了
     showLoading: false,
-    //错误的回调，返回:错误信息
-    errorCallback: (response) => {
-      ElMessageBox.alert(response.info, "错误", {
-        "show-close": false,
-        callback: (action) => {
-          proxy.Message.warn(response.data.msg);
-        },
-      });
-    },
   });
   if (!result) {
+    
     return;
   }
   statusInfo.value = result.data;

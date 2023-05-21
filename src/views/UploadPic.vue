@@ -47,7 +47,10 @@
       </el-form-item>
       <el-form-item>
         <div class="op-btn">
-          <el-button type="primary" v-debounce="{fn:postHandle, event:'click', delay:200}" size="large"
+          <el-button
+            type="primary"
+            v-debounce="{ fn: postHandle, event: 'click', delay: 200 }"
+            size="large"
             >上传</el-button
           >
         </div>
@@ -88,19 +91,21 @@ const removeCommentImg = () => {
 const postHandle = () => {
   formDataRef.value.validate(async (valid) => {
     if (!valid) return;
-    if(!commentImg.value){
-      proxy.Message.error("请输入图片")
+    if (!commentImg.value) {
+      proxy.Message.error("请输入图片");
     }
     // 参数准备完毕：调用接口更新文章
     const params = Object.assign({}, formData.value);
     const result = await proxy.Request({
       url: api.addPic,
       params: params,
+      showError:false
     });
     if (!result) {
+      proxy.Message.error("图片已入库");
       return;
     }
-      proxy.Message.success("上传成功")
+    proxy.Message.success("上传成功");
   });
 };
 </script>

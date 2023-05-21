@@ -1,10 +1,11 @@
 import { createApp } from 'vue'
+// 引入样式
 import './assets/base.scss'
 import App from './App.vue'
 //引入element plus
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
+// import 'element-plus/dist/index.css'
 //引入cookies
 import VueCookies from 'vue-cookies'
 import store from './store/index.js'

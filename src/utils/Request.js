@@ -59,33 +59,29 @@ instance.interceptors.response.use(
         }
     },
     (error) => {
-        // 服务端回复错误时，提醒用户，响应拦截器做点什么
-        // 请求报错,后端服务不正常500，502状态码
         if (error.config.showLoading && loading) {
             loading.close()
         }
         const responseData = error.response.data
         // 状态
-        if (responseData.code === 4) {
-            return Promise.reject({ showError: true, msg: "用户名或密码错误" })
-        } else if (responseData.code === 1) {
-            return Promise.reject({ showError: true, msg: "请求参数错误" })
-        }else if (responseData.code === 2){
-            return Promise.reject({ showError: true, msg: "图片已存在" })
-        }else if (responseData.code === 3){
+        if (responseData.code === 1) {
+            return Promise.reject({ showError: true, msg:"请求参数错误"  })
+        } else if (responseData.code === 3){
             router.push('/user/login')
             return Promise.reject({ showError: true, msg: "用户已存在,请登录" })
-        }else if (responseData.code == undefined){
-            return Promise.reject({ showError: true, msg: "你无操作权限" })
+        }else if (responseData.code === 4) {
+            return Promise.reject({ showError: true, msg: "用户名或密码错误" })
+        }else if (responseData.code == undefined || responseData.code === 6){
+            return Promise.reject({ showError: true, msg: "你无操作权限，请登录管理员用户" })
         }
-        return Promise.reject({ showError: true, msg: error.response.data.msg })
+        return Promise.reject({ showError: true, msg: responseData.msg })
     }
 )
 // 请求封装
 const request = (config) => {
     //适合文件上传
     // axios请求接收的参数url,params,dataType,showLoading,errorCallback,showError
-    const { url, params, dataType, showLoading = true, errorCallback, showError = true } = config
+    const { url, params, dataType, showLoading = true, errorCallback, showError=true } = config
     let contentType = contentTypeForm
     //可以使用 FormData 上传文件
     let formData = new FormData()
@@ -106,7 +102,7 @@ const request = (config) => {
         errorCallback: errorCallback,
         showError: showError
     }).catch(error => {
-        if (error.showError) {
+        if (showError) {
             Message.error(error.msg)
         }
         // 这里是为什么判断if(!result)的原因
