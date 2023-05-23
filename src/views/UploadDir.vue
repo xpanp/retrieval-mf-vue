@@ -65,8 +65,8 @@ const rules = {
   ],
 };
 const api = {
-  uploadDir: "/api/add_dir",
-  statusProcess: "/api/add_dir/status",
+  uploadDir: "/add_dir",
+  statusProcess: "/add_dir/status",
 };
 const task_nums = ref(0);
 const taskid = ref("");

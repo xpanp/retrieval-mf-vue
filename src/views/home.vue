@@ -161,7 +161,7 @@ const rules = {
   algo: [{ required: true, message: "请选择算法", trigger: "blur" }],
 };
 const api = {
-  search: "/api/search",
+  search: "/search",
 };
 // 图片上传
 const commentImg = ref(null);

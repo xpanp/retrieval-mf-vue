@@ -47,7 +47,7 @@ const router = useRouter();
 const formData = ref({});
 const formDataRef = ref();
 const api = {
-  login: "/api/user/login",
+  login: "/user/login",
 };
 
 const rules = {

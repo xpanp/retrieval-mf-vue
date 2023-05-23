@@ -63,7 +63,7 @@
 import { ref, getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
 const api = {
-  addPic: "/api/add_pic",
+  addPic: "/add_pic",
 };
 const formData = ref({});
 const formDataRef = ref();
