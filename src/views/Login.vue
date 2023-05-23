@@ -47,8 +47,9 @@ const router = useRouter();
 const formData = ref({});
 const formDataRef = ref();
 const api = {
-  login: "api/user/login",
+  login: "/api/user/login",
 };
+
 const rules = {
   account: [
     { required: true, message: "请输入邮箱", trigger: "blur" },

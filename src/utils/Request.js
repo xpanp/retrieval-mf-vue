@@ -10,7 +10,7 @@ const contentTypeJson = "application/json"
 //引入cookies
 import VueCookies from 'vue-cookies'
 const instance = axios.create({
-    baseURL: '/api',
+    baseURL: '',
     timeout: 10 * 1000
 })
 

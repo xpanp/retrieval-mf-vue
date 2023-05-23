@@ -68,7 +68,7 @@ const formData = ref({});
 const formDataRef = ref();
 // 接口
 const api = {
-  toRegister: "api/user/register",
+  toRegister: "/api/user/register",
 };
 // 检查两次密码
 const checkRepassword = (rule, value, callback) => {
